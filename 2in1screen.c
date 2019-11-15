@@ -23,22 +23,24 @@ double accel_y = 0.0,
 	   accel_g = 7.0;
 
 int current_state = 0;
-
+int dstate = 0;
 int rotation_changed(){
 	int state = 0;
-
 	if(accel_y < -accel_g) state = 0;
 	else if(accel_y > accel_g) state = 1;
-#if N_STATE == 4
-	else if(accel_x > accel_g) state = 2;
-	else if(accel_x < -accel_g) state = 3;
-#endif
+	#if N_STATE == 4
+    	else if(accel_x > accel_g) state = 2;
+    	else if(accel_x < -accel_g) state = 3;
+	#endif
 
 	if(current_state!=state){
-		current_state = state;
-		return 1;
+		if(dstate ==state){
+			current_state = state;
+			return 1;
+		}
 	}
-	else return 0;
+	dstate = state;
+	return 0;
 }
 
 FILE* bdopen(char const *fname, char leave_open){
@@ -99,7 +101,7 @@ int main(int argc, char const *argv[]) {
 #endif
 		if(rotation_changed())
 			rotate_screen();
-		sleep(2);
+		sleep(1);
 	}
 	
 	return 0;
